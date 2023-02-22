@@ -10,12 +10,16 @@ namespace Mission06_jhalver6.Models
     {
         [Key]
         [Required]
-        public int Movieid { get; set; }
+        public int MovieId { get; set; }
         [Required(ErrorMessage = "The Category is required")]
-        public string Category { get; set; }
+        // Build Foreign Key Relationship
+        public int CategoryId { get; set; }
+        
+        public Category Category { get; set; }
         [Required(ErrorMessage = "The Title is required")]
         public string Title { get; set; }
         [Required(ErrorMessage = "The Year is required")]
+        
         
         public int Year { get; set; }
         [Required(ErrorMessage = "The Director is required")]

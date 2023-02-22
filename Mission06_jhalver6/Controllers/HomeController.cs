@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Mission06_jhalver6.Models;
 using System;
@@ -11,13 +12,11 @@ namespace Mission06_jhalver6.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-        private MovieCollectionContext _blahContext { get; set; }
+        private MovieCollectionContext mcContext { get; set; }
 
-        public HomeController(ILogger<HomeController> logger, MovieCollectionContext someName)
+        public HomeController(MovieCollectionContext someName)
         {
-            _logger = logger;
-            _blahContext = someName;
+            mcContext = someName;
         }
 
         public IActionResult Index()
@@ -33,6 +32,9 @@ namespace Mission06_jhalver6.Controllers
         [HttpGet]
         public IActionResult NewMovie()
         {
+
+            ViewBag.Categories = mcContext.Categories.ToList();
+
             return View();
         }
 
@@ -41,18 +43,63 @@ namespace Mission06_jhalver6.Controllers
         {
             if (ModelState.IsValid)
             {
-                _blahContext.Add(am);
-                _blahContext.SaveChanges();
+                mcContext.Add(am);
+                mcContext.SaveChanges();
                 return View("Confirmation", am);
             }
             else
             {
-                return View();
+                ViewBag.Categories = mcContext.Categories.ToList();
+                return View(am);
             }
         }
         public IActionResult Podcast()
         {
             return View();
+        }
+
+        public IActionResult CollectionList()
+        {
+            var collections = mcContext.Movie
+                .Include(x => x.Category)
+                .OrderBy(x => x.Title)
+                .ToList();
+
+            return View(collections);
+        }
+        [HttpGet]
+        public IActionResult Edit(int movieid)
+        {
+            ViewBag.Categories = mcContext.Categories.ToList();
+
+            var movie = mcContext.Movie.Single(x => x.MovieId == movieid);
+
+            return View("NewMovie", movie);
+        }
+
+        [HttpPost]
+
+        public IActionResult Edit (AddMovie movie)
+        {
+            mcContext.Update(movie);
+            mcContext.SaveChanges();
+            return RedirectToAction("CollectionList");
+        }
+        [HttpGet]
+        public IActionResult Delete(int movieid)
+        {
+            var movie = mcContext.Movie.Single(x => x.MovieId == movieid);
+
+            return View(movie);
+        }
+        [HttpPost]
+
+        public IActionResult Delete (AddMovie am)
+        {
+            mcContext.Movie.Remove(am);
+            mcContext.SaveChanges();
+
+            return RedirectToAction("CollectionList");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

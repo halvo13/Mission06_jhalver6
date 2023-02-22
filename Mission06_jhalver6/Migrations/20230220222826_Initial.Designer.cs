@@ -8,7 +8,7 @@ using Mission06_jhalver6.Models;
 namespace Mission06_jhalver6.Migrations
 {
     [DbContext(typeof(MovieCollectionContext))]
-    [Migration("20230214010036_Initial")]
+    [Migration("20230220222826_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -23,9 +23,8 @@ namespace Mission06_jhalver6.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Director")
                         .IsRequired()
@@ -46,7 +45,6 @@ namespace Mission06_jhalver6.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Title")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Year")
@@ -54,13 +52,15 @@ namespace Mission06_jhalver6.Migrations
 
                     b.HasKey("Movieid");
 
+                    b.HasIndex("CategoryId");
+
                     b.ToTable("Movie");
 
                     b.HasData(
                         new
                         {
                             Movieid = 1,
-                            Category = "Adventure",
+                            CategoryId = 1,
                             Director = "Kevin Reynolds",
                             Edited = false,
                             Rating = "PG-13",
@@ -70,7 +70,7 @@ namespace Mission06_jhalver6.Migrations
                         new
                         {
                             Movieid = 2,
-                            Category = "Romantic Comedy",
+                            CategoryId = 2,
                             Director = "Andy Tennant",
                             Edited = false,
                             Rating = "PG-13",
@@ -80,13 +80,58 @@ namespace Mission06_jhalver6.Migrations
                         new
                         {
                             Movieid = 3,
-                            Category = "Action",
+                            CategoryId = 3,
                             Director = "Christopher Nolan",
                             Edited = false,
                             Rating = "PG-13",
                             Title = "The Dark Knight",
                             Year = 2008
                         });
+                });
+
+            modelBuilder.Entity("Mission06_jhalver6.Models.Category", b =>
+                {
+                    b.Property<int>("CategoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CategoryName")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("CategoryId");
+
+                    b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            CategoryId = 1,
+                            CategoryName = "Adventure"
+                        },
+                        new
+                        {
+                            CategoryId = 2,
+                            CategoryName = "Romantic Comedy"
+                        },
+                        new
+                        {
+                            CategoryId = 3,
+                            CategoryName = "Action"
+                        },
+                        new
+                        {
+                            CategoryId = 4,
+                            CategoryName = "Comedy"
+                        });
+                });
+
+            modelBuilder.Entity("Mission06_jhalver6.Models.AddMovie", b =>
+                {
+                    b.HasOne("Mission06_jhalver6.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
